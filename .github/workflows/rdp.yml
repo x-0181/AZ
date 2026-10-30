@@ -9,12 +9,10 @@ jobs:
     timeout-minutes: 9999
 
     steps:
-      - name: Download
-        run: Invoke-WebRequest https://bin.equinox.io/c/4VhdD3az1hJ/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-      - name: Extract
-        run: Expand-Archive ngrok.zip
+      - name: Download & Install Ngrok
+        run: choco install ngrok -y
       - name: Auth
-        run: .\ngrok\ngrok.exe authtoken $env:NGROK_AUTH_TOKEN
+        run: ngrok authtoken $env:NGROK_AUTH_TOKEN
         env:
           NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Enable TS
@@ -24,4 +22,4 @@ jobs:
           Set-NetFirewallRule -DisplayGroup "Remote Desktop"
           Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString "@Cyb3rking" -AsPlainText -Force)
       - name: Create Tunnel
-        run: .\ngrok\ngrok.exe tcp 3389
+        run: ngrok tcp 3389
