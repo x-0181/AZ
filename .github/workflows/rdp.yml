@@ -4,22 +4,17 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-
     runs-on: windows-latest
     timeout-minutes: 9999
 
     steps:
-      - name: Download & Install Ngrok
-        run: choco install ngrok -y
-      - name: Auth
-        run: ngrok authtoken $env:NGROK_AUTH_TOKEN
-        env:
-          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Enable TS
         run: |
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenysTSConnections" -Value 0
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
           Set-NetFirewallRule -DisplayGroup "Remote Desktop"
           Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString "@Cyb3rking" -AsPlainText -Force)
+      - name: Install Pinggy
+        run: choco install pinggy -y
       - name: Create Tunnel
-        run: ngrok tcp 3389
+        run: pinggy -p 443 127.0.0.1:3389
